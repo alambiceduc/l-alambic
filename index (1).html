@@ -156,13 +156,21 @@ body{font-family:'Outfit',sans-serif;background:var(--cr);color:var(--tx);min-he
 
 <div class="hdr">
   <div class="logo">
-    <svg width="36" height="44" viewBox="0 0 44 54" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M17 5L17 22L5 42Q2 48 6 51Q9 54 14 54L30 54Q35 54 38 51Q42 48 39 42L27 22L27 5" stroke="#4E7A6E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      <line x1="13" y1="5" x2="31" y2="5" stroke="#4E7A6E" stroke-width="2" stroke-linecap="round"/>
-      <line x1="12" y1="30" x2="32" y2="30" stroke="#4E7A6E" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2 3"/>
-      <circle cx="28" cy="42" r="3.5" fill="#4E7A6E"/>
-      <path d="M27 5Q35 5 35 0" stroke="#4E7A6E" stroke-width="1.8" stroke-linecap="round"/>
-      <circle cx="35" cy="0.5" r="2" fill="#4E7A6E"/>
+    <svg width="48" height="44" viewBox="0 0 80 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Corps de la fiole ronde -->
+      <circle cx="28" cy="50" r="18" stroke="#4E7A6E" stroke-width="2.5" fill="none"/>
+      <!-- Remplissage bas de la fiole -->
+      <path d="M12 55 Q12 68 28 68 Q44 68 44 55" fill="#7FA99B" opacity="0.3"/>
+      <!-- Col de la fiole -->
+      <rect x="22" y="18" width="12" height="16" rx="2" stroke="#4E7A6E" stroke-width="2.5" fill="none"/>
+      <!-- Barre horizontale du col -->
+      <line x1="19" y1="18" x2="37" y2="18" stroke="#4E7A6E" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- Tuyau recourbé partant du col vers la droite et vers le bas -->
+      <path d="M34 12 Q50 12 50 26 Q50 38 60 42" stroke="#4E7A6E" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      <!-- Goutte qui tombe du tuyau -->
+      <ellipse cx="62" cy="48" rx="3" ry="4" fill="#4E7A6E" opacity="0.8"/>
+      <!-- Petite ligne de col en haut -->
+      <line x1="28" y1="10" x2="28" y2="18" stroke="#4E7A6E" stroke-width="2" stroke-linecap="round"/>
     </svg>
     <div class="logo-text">L&#8217;<sup>o</sup>Alambic</div>
   </div>
@@ -609,7 +617,7 @@ ${cogNeg.length>0?'DIFFICULTÉS COGNITIVES IDENTIFIÉES :
 '+cogNeg.map(c=>'- '+c).join('
 '):''}
 
-${Object.keys(ST.suppCk).length>0?'POINTS D'APPUIS IDENTIFIÉS : '+ST.suppDom.map(d=>getLabelFor(d)).join(', '):''}
+${Object.keys(ST.suppCk).length>0?'POINTS D`APPUIS IDENTIFIÉS : '+ST.suppDom.map(d=>getLabelFor(d)).join(', '):''}
 
 Génère un plan d'action structuré en 3 parties, uniquement en français :
 
@@ -631,7 +639,7 @@ Format : titres en **gras**, tirets pour les listes. Longueur : 450-550 mots.`;
     const res=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
     let txt='';
     if(res.ok){const data=await res.json();txt=data.content?.[0]?.text||'Erreur.';}
-    else txt='Erreur de connexion à l'API. Vérifiez la configuration Vercel.';
+    else txt='Erreur de connexion à l`API. Vérifiez la configuration Vercel.';
     txt=txt.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/^- (.+)$/gm,'<span style="display:block;padding-left:.5rem">• $1</span>').replace(/
 
 /g,'<br><br>').replace(/
