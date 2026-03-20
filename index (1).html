@@ -156,23 +156,16 @@ body{font-family:'Outfit',sans-serif;background:var(--cr);color:var(--tx);min-he
 
 <div class="hdr">
   <div class="logo">
-    <svg width="48" height="44" viewBox="0 0 80 70" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <!-- Corps de la fiole ronde -->
-      <circle cx="28" cy="50" r="18" stroke="#4E7A6E" stroke-width="2.5" fill="none"/>
-      <!-- Remplissage bas de la fiole -->
-      <path d="M12 55 Q12 68 28 68 Q44 68 44 55" fill="#7FA99B" opacity="0.3"/>
-      <!-- Col de la fiole -->
-      <rect x="22" y="18" width="12" height="16" rx="2" stroke="#4E7A6E" stroke-width="2.5" fill="none"/>
-      <!-- Barre horizontale du col -->
-      <line x1="19" y1="18" x2="37" y2="18" stroke="#4E7A6E" stroke-width="2.5" stroke-linecap="round"/>
-      <!-- Tuyau recourbé partant du col vers la droite et vers le bas -->
-      <path d="M34 12 Q50 12 50 26 Q50 38 60 42" stroke="#4E7A6E" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-      <!-- Goutte qui tombe du tuyau -->
-      <ellipse cx="62" cy="48" rx="3" ry="4" fill="#4E7A6E" opacity="0.8"/>
-      <!-- Petite ligne de col en haut -->
-      <line x1="28" y1="10" x2="28" y2="18" stroke="#4E7A6E" stroke-width="2" stroke-linecap="round"/>
+    <svg width="36" height="40" viewBox="0 0 60 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="22" cy="52" r="16" stroke="#4E7A6E" stroke-width="2.2" fill="none"/>
+      <path d="M8 57 Q8 68 22 68 Q36 68 36 57" fill="#7FA99B" opacity="0.25"/>
+      <rect x="17" y="20" width="10" height="14" rx="2" stroke="#4E7A6E" stroke-width="2.2" fill="none"/>
+      <line x1="14" y1="20" x2="30" y2="20" stroke="#4E7A6E" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M27 14 Q42 14 42 26 Q42 36 52 40" stroke="#4E7A6E" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+      <path d="M52 44 Q52 49 56 49 Q60 49 60 44 Q60 40 56 38 Q52 40 52 44Z" fill="#4E7A6E"/>
+      <line x1="22" y1="8" x2="22" y2="20" stroke="#4E7A6E" stroke-width="2" stroke-linecap="round"/>
     </svg>
-    <div class="logo-text">L&#8217;<sup>o</sup>Alambic</div>
+    <div class="logo-text">L<svg style="display:inline-block;vertical-align:middle;margin:0 1px" width="10" height="14" viewBox="0 0 10 14"><path d="M5 12 Q5 14 7 14 Q9 14 9 12 Q9 9 5 7 Q1 9 1 12 Q1 14 3 14 Q5 14 5 12Z" fill="#4E7A6E"/></svg>Alambic</div>
   </div>
   <div id="badge" class="badge" style="display:none"><strong id="badge-name"></strong>&nbsp;·&nbsp;<span id="badge-lvl"></span></div>
 </div>
@@ -495,7 +488,7 @@ function S7(p){
 
   let h=`<div class="pan">
     <div class="ptit">✨ Synthèse — ${ST.prenom} (${ST.niveau})</div>
-    <div class="pdesc">Basée sur ${totalDiff} observable${totalDiff>1?'s':''} de difficultés${totalSupp>0?' et '+totalSupp+' point'+(totalSupp>1?'s':'')+' d'appuis':''} cochés.</div>`;
+    <div class="pdesc">Basée sur ${totalDiff} observable${totalDiff>1?'s':''} de difficultés${totalSupp>0?' et '+totalSupp+' point'+(totalSupp>1?'s':'')+' d’appuis':''} cochés.</div>`;
 
   // Recommandations fondamentaux (non bloquant, juste conseils)
   if(fondCodes.length>0){
@@ -601,23 +594,20 @@ async function callAI(p,besoins,cogNeg){
     return '';
   }).filter(Boolean);
 
+  const nl='\n';
   const prompt=`Tu es une enseignante spécialisée coordinatrice ULIS, experte en adaptations pédagogiques inclusives et en CUA (Conception Universelle des Apprentissages).
 
 PROFIL DE L'ÉLÈVE : ${ST.prenom}, niveau ${ST.niveau} (${ST.cycle==='maternelle'?'Maternelle':'Élémentaire'})
 
 BESOINS PRIORITAIRES (du plus au moins prioritaire) :
-${top3.map((b,i)=>`${i+1}. ${b}`).join('
-')}
+${top3.map((b,i)=>String(i+1)+'. '+b).join(nl)}
 
 OBSERVATIONS DE L'ENSEIGNANT (difficultés) :
-${diffObs.join('
-')||'Non précisées'}
+${diffObs.join(nl)||'Non précisées'}
 
-${cogNeg.length>0?'DIFFICULTÉS COGNITIVES IDENTIFIÉES :
-'+cogNeg.map(c=>'- '+c).join('
-'):''}
+${cogNeg.length>0?'DIFFICULTÉS COGNITIVES IDENTIFIÉES :\n'+cogNeg.map(c=>'- '+c).join(nl):''}
 
-${Object.keys(ST.suppCk).length>0?'POINTS D`APPUIS IDENTIFIÉS : '+ST.suppDom.map(d=>getLabelFor(d)).join(', '):''}
+${Object.keys(ST.suppCk).length>0?'POINTS D’APPUIS IDENTIFIÉS : '+ST.suppDom.map(d=>getLabelFor(d)).join(', '):''}
 
 Génère un plan d'action structuré en 3 parties, uniquement en français :
 
@@ -640,10 +630,7 @@ Format : titres en **gras**, tirets pour les listes. Longueur : 450-550 mots.`;
     let txt='';
     if(res.ok){const data=await res.json();txt=data.content?.[0]?.text||'Erreur.';}
     else txt='Erreur de connexion à l`API. Vérifiez la configuration Vercel.';
-    txt=txt.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/^- (.+)$/gm,'<span style="display:block;padding-left:.5rem">• $1</span>').replace(/
-
-/g,'<br><br>').replace(/
-/g,'<br>');
+    txt=txt.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/^- (.+)$/gm,'<span style="display:block;padding-left:.5rem">• $1</span>').replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
     ST.aiTxt=txt;
     p.querySelector('#aiload').style.display='none';
     const at=p.querySelector('#aitxt');at.style.display='block';at.innerHTML=txt;
