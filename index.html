@@ -156,16 +156,15 @@ body{font-family:'Outfit',sans-serif;background:var(--cr);color:var(--tx);min-he
 
 <div class="hdr">
   <div class="logo">
-    <svg width="36" height="40" viewBox="0 0 60 70" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="22" cy="52" r="16" stroke="#4E7A6E" stroke-width="2.2" fill="none"/>
-      <path d="M8 57 Q8 68 22 68 Q36 68 36 57" fill="#7FA99B" opacity="0.25"/>
-      <rect x="17" y="20" width="10" height="14" rx="2" stroke="#4E7A6E" stroke-width="2.2" fill="none"/>
-      <line x1="14" y1="20" x2="30" y2="20" stroke="#4E7A6E" stroke-width="2.2" stroke-linecap="round"/>
-      <path d="M27 14 Q42 14 42 26 Q42 36 52 40" stroke="#4E7A6E" stroke-width="2.2" stroke-linecap="round" fill="none"/>
-      <path d="M52 44 Q52 49 56 49 Q60 49 60 44 Q60 40 56 38 Q52 40 52 44Z" fill="#4E7A6E"/>
-      <line x1="22" y1="8" x2="22" y2="20" stroke="#4E7A6E" stroke-width="2" stroke-linecap="round"/>
+    <svg width="36" height="44" viewBox="0 0 44 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M17 5L17 22L5 42Q2 48 6 51Q9 54 14 54L30 54Q35 54 38 51Q42 48 39 42L27 22L27 5" stroke="#4E7A6E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <line x1="13" y1="5" x2="31" y2="5" stroke="#4E7A6E" stroke-width="2" stroke-linecap="round"/>
+      <line x1="12" y1="30" x2="32" y2="30" stroke="#4E7A6E" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2 3"/>
+      <circle cx="28" cy="42" r="3.5" fill="#4E7A6E"/>
+      <path d="M27 5Q35 5 35 0" stroke="#4E7A6E" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="35" cy="0.5" r="2" fill="#4E7A6E"/>
     </svg>
-    <div class="logo-text">L<svg style="display:inline-block;vertical-align:middle;margin:0 1px" width="10" height="14" viewBox="0 0 10 14"><path d="M5 12 Q5 14 7 14 Q9 14 9 12 Q9 9 5 7 Q1 9 1 12 Q1 14 3 14 Q5 14 5 12Z" fill="#4E7A6E"/></svg>Alambic</div>
+    <div class="logo-text">L&#8217;<sup>o</sup>Alambic</div>
   </div>
   <div id="badge" class="badge" style="display:none"><strong id="badge-name"></strong>&nbsp;·&nbsp;<span id="badge-lvl"></span></div>
 </div>
@@ -488,7 +487,7 @@ function S7(p){
 
   let h=`<div class="pan">
     <div class="ptit">✨ Synthèse — ${ST.prenom} (${ST.niveau})</div>
-    <div class="pdesc">Basée sur ${totalDiff} observable${totalDiff>1?'s':''} de difficultés${totalSupp>0?' et '+totalSupp+' point'+(totalSupp>1?'s':'')+' d’appuis':''} cochés.</div>`;
+    <div class="pdesc">Basée sur ${totalDiff} observable${totalDiff>1?'s':''} de difficultés${totalSupp>0?' et '+totalSupp+' point'+(totalSupp>1?'s':'')+' d'appuis':''} cochés.</div>`;
 
   // Recommandations fondamentaux (non bloquant, juste conseils)
   if(fondCodes.length>0){
@@ -594,20 +593,23 @@ async function callAI(p,besoins,cogNeg){
     return '';
   }).filter(Boolean);
 
-  const nl='\n';
   const prompt=`Tu es une enseignante spécialisée coordinatrice ULIS, experte en adaptations pédagogiques inclusives et en CUA (Conception Universelle des Apprentissages).
 
 PROFIL DE L'ÉLÈVE : ${ST.prenom}, niveau ${ST.niveau} (${ST.cycle==='maternelle'?'Maternelle':'Élémentaire'})
 
 BESOINS PRIORITAIRES (du plus au moins prioritaire) :
-${top3.map((b,i)=>String(i+1)+'. '+b).join(nl)}
+${top3.map((b,i)=>`${i+1}. ${b}`).join('
+')}
 
 OBSERVATIONS DE L'ENSEIGNANT (difficultés) :
-${diffObs.join(nl)||'Non précisées'}
+${diffObs.join('
+')||'Non précisées'}
 
-${cogNeg.length>0?'DIFFICULTÉS COGNITIVES IDENTIFIÉES :\n'+cogNeg.map(c=>'- '+c).join(nl):''}
+${cogNeg.length>0?'DIFFICULTÉS COGNITIVES IDENTIFIÉES :
+'+cogNeg.map(c=>'- '+c).join('
+'):''}
 
-${Object.keys(ST.suppCk).length>0?'POINTS D’APPUIS IDENTIFIÉS : '+ST.suppDom.map(d=>getLabelFor(d)).join(', '):''}
+${Object.keys(ST.suppCk).length>0?'POINTS D'APPUIS IDENTIFIÉS : '+ST.suppDom.map(d=>getLabelFor(d)).join(', '):''}
 
 Génère un plan d'action structuré en 3 parties, uniquement en français :
 
@@ -629,8 +631,11 @@ Format : titres en **gras**, tirets pour les listes. Longueur : 450-550 mots.`;
     const res=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
     let txt='';
     if(res.ok){const data=await res.json();txt=data.content?.[0]?.text||'Erreur.';}
-    else txt='Erreur de connexion à l`API. Vérifiez la configuration Vercel.';
-    txt=txt.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/^- (.+)$/gm,'<span style="display:block;padding-left:.5rem">• $1</span>').replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
+    else txt='Erreur de connexion à l'API. Vérifiez la configuration Vercel.';
+    txt=txt.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/^- (.+)$/gm,'<span style="display:block;padding-left:.5rem">• $1</span>').replace(/
+
+/g,'<br><br>').replace(/
+/g,'<br>');
     ST.aiTxt=txt;
     p.querySelector('#aiload').style.display='none';
     const at=p.querySelector('#aitxt');at.style.display='block';at.innerHTML=txt;
