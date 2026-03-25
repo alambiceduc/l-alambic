@@ -108,6 +108,16 @@ body{font-family:'Outfit',sans-serif;background:var(--cr);color:var(--tx);min-he
 .cbtn.p{background:#d4edda;border-color:#5a9e6e;color:#2d6a4f;}
 .cbtn.m{background:#fde8e8;border-color:#c97b7b;color:#8b2c2c;}
 .cbtn.u{background:#eee8f5;border-color:#9b87c2;color:#4a3a7a;}
+.tip-btn{background:none;border:none;cursor:pointer;font-size:.85rem;margin-left:.35rem;opacity:.55;transition:opacity .15s;vertical-align:middle;padding:0 2px;line-height:1;}
+.tip-btn:hover{opacity:1;}
+.cog-tip{margin-top:.55rem;padding:.6rem .75rem;background:var(--sgp);border-radius:9px;font-size:.76rem;border:1px solid var(--bd);}
+.cog-tip-neg{margin-bottom:.35rem;}
+.cog-tip-pos{}
+.cog-tip strong{font-size:.72rem;font-weight:700;display:block;margin-bottom:.2rem;}
+.cog-tip-neg strong{color:#8b2c2c;}
+.cog-tip-pos strong{color:#2d6a4f;}
+.cog-tip ul{margin:0;padding-left:1.1rem;color:var(--tx);}
+.cog-tip ul li{margin-bottom:.15rem;line-height:1.45;}
 
 /* SYNTHESE */
 .sblk{margin-bottom:1.3rem;}
@@ -150,7 +160,20 @@ body{font-family:'Outfit',sans-serif;background:var(--cr);color:var(--tx);min-he
 .bdng{background:var(--wh);color:var(--tc);border:1.5px solid #e0b0a0;}.bdng:hover{background:#fdf0ea;}
 
 @media print{.stp-wrap,.brow,.hdr{display:none!important;}body{background:#fff;}.pan{border:none;padding:0;}}
+
+/* Observable list in synthesis */
+.obs-domain-lbl{font-size:.72rem;font-weight:600;color:var(--sgd);margin-top:.55rem;margin-bottom:.15rem;text-transform:uppercase;letter-spacing:.03em;}
+.obs-domain-lbl:first-child{margin-top:.2rem;}
+.obs-list{margin:0 0 .2rem 0;padding-left:1.1rem;}
+.obs-list li{font-size:.77rem;color:var(--tx);line-height:1.5;margin-bottom:.1rem;}
+/* Cognitif full-width radar */
+.cog-full{grid-column:1/-1;}
+.cog-rad-wrap{width:100%;max-width:420px;margin:.5rem auto 0;}
+.cog-leg{font-size:.76rem;color:var(--tl);margin-top:.45rem;text-align:center;}
+.cog-leg-neg{color:#c0392b;}
+.cog-leg-pos{color:var(--sgd);}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
 <body>
 <div id="app">
@@ -320,6 +343,34 @@ function getLabelFor(domId){
   return (doms.find(d=>d.id===domId)||{}).label||domId;
 }
 
+
+// ── HELPERS: observable lookup for synthesis ──
+function getObsDomainItems(ckObj){
+  const by={};
+  for(const code of Object.keys(ckObj)){
+    let found=false;
+    for(const [,subs] of Object.entries(OD.grouped)){
+      for(const [,sub] of Object.entries(subs)){
+        const it=sub.items.find(i=>i.code===code);
+        if(it){if(!by[sub.label])by[sub.label]=[];by[sub.label].push(it.obs);found=true;break;}
+      }
+      if(found)break;
+    }
+  }
+  return by;
+}
+function getSuppDomainItems(ckObj){
+  const by={};
+  for(const code of Object.keys(ckObj)){
+    const parts=code.split('_');
+    if(parts.length<3)continue;
+    const domId=parts[1];
+    const idx=parseInt(parts[2]);
+    const txt=(SD[ST.cycle][domId]||[])[idx];
+    if(txt){const lbl=getLabelFor(domId);if(!by[lbl])by[lbl]=[];by[lbl].push(txt);}
+  }
+  return by;
+}
 // ── S0: ACCUEIL ──
 function S0(p){
   p.innerHTML=`<div class="pan">
@@ -431,6 +482,53 @@ function S5(p){
   p.querySelector('#s5n').onclick=()=>go(6);
 }
 
+const COG_EX={
+  att:{
+    neg:["Se lève souvent ou se retourne fréquemment","Regarde par la fenêtre, est facilement distrait(e)","N'achève pas les tâches, abandonne en cours de route","Oublie les consignes avant d'avoir commencé","Perd son matériel ou sa place dans le texte"],
+    pos:["Peut rester concentré(e) longtemps sur une activité qui l'intéresse","Suit les consignes de bout en bout sans rappel","Résiste aux distractions visuelles et sonores"]
+  },
+  inh:{
+    neg:["Parle sans lever la main, interrompt les autres","Répond avant la fin de la question","A du mal à attendre son tour","Agit ou touche avant d'avoir réfléchi","Réagit de façon excessive aux frustrations"],
+    pos:["Attend son tour sans rappel","Réfléchit avant d'agir ou de répondre","Respecte les règles spontanément","Maîtrise ses réactions face aux imprévus"]
+  },
+  mdt:{
+    neg:["Oublie la consigne dès le début de l'exercice","Perd le fil en calcul mental","Ne peut pas retenir plusieurs informations à la fois","Relit constamment pour retrouver le sens","Confond l'ordre des étapes dans une procédure"],
+    pos:["Retient facilement plusieurs informations simultanément","Gère bien les tâches à étapes multiples","Mène de front écriture et réflexion sans difficulté"]
+  },
+  fle:{
+    neg:["Réagit mal aux changements de routine ou d'emploi du temps","Reste bloqué(e) sur une stratégie qui ne fonctionne pas","Ne voit pas plusieurs façons de résoudre un problème","Supporte mal les erreurs ou les imprévus","S'accroche à une seule façon de faire"],
+    pos:["S'adapte facilement aux imprévus","Change de méthode sans difficulté quand une autre est proposée","Rebondit vite après une erreur"]
+  },
+  pla:{
+    neg:["Ne sait pas par où commencer une tâche complexe","Saute des étapes, fait dans le désordre","Ne distingue pas l'essentiel de l'accessoire","Productions écrites sans plan ni organisation","Sous-estime le temps nécessaire à une tâche"],
+    pos:["Organise son travail naturellement étape par étape","Anticipe les obstacles avant de commencer","Productions bien structurées et cohérentes"]
+  },
+  org:{
+    neg:["Cartable en désordre, perd souvent son matériel","Cahiers illisibles, pages froissées, feuilles éparpillées","Ne retrouve pas ses affaires au bon moment","Gestion du temps très difficile","Bureau encombré, espace de travail chaotique"],
+    pos:["Matériel toujours en ordre et prêt","Espace de travail rangé spontanément","Gère bien son temps et ses affaires"]
+  },
+  rai:{
+    neg:["Difficultés à faire des déductions ou des inférences","Ne transfère pas les apprentissages d'une situation à une autre","A du mal avec les analogies et les comparaisons","Comprend le mot à mot mais pas le sens global","Raisonnement très concret, peu de généralisation"],
+    pos:["Fait facilement des liens entre différents apprentissages","Comprend les concepts abstraits","Généralise une règle à de nouvelles situations"]
+  },
+  mem:{
+    neg:["Oublie rapidement les leçons apprises","Ne mémorise pas les tables de multiplication","Perd le vocabulaire acquis d'une séance à l'autre","Ne retient pas les poésies ni les procédures","Doit réapprendre les mêmes notions plusieurs fois"],
+    pos:["Très bonne mémoire des événements et des apprentissages","Retient facilement les faits, dates et vocabulaire","Mémorise rapidement les tables et procédures"]
+  },
+  rsp:{
+    neg:["Confond droite et gauche","Difficultés à se repérer sur une feuille","Écriture en miroir, lettres inversées (b/d, p/q)","Ne respecte pas les marges, lignes, carreaux","Difficultés à copier un tracé géométrique"],
+    pos:["Bon sens de l'espace sur la feuille","Bonne orientation et conscience de la latéralité","Comprend facilement les notions spatiales"]
+  },
+  rst:{
+    neg:["Ne sait pas quel jour on est sans aide","Confond hier, aujourd'hui, demain","Ne comprend pas les durées (5 min, 1 heure…)","Ne se repère pas dans l'emploi du temps","Difficultés avec les séquences temporelles (avant/après)"],
+    pos:["Bon sens du temps qui passe","Comprend facilement les séquences et les durées","Se repère aisément dans l'emploi du temps"]
+  },
+  aut:{
+    neg:["Attend systématiquement la validation de l'adulte avant d'agir","Ne se lance pas seul(e) dans une tâche","N'essaie pas avant de demander de l'aide","N'entreprend pas de corriger ses erreurs seul(e)","Abandon rapide face à la première difficulté"],
+    pos:["Se lance sans solliciter l'adulte","Vérifie spontanément son travail","Cherche des solutions avant de demander de l'aide","Persiste face aux difficultés"]
+  }
+};
+
 // ── S6: COGNITIF ──
 function S6(p){
   p.innerHTML=`<div class="pan">
@@ -448,7 +546,10 @@ function S6(p){
   COGS.forEach(cg=>{
     const v=ST.cog[cg.c]||null;
     const tr=mk('tr');
-    tr.innerHTML=`<td><div class="clb">${cg.l}</div></td><td><div class="cdsc">${cg.d}</div></td><td><div class="cbtns"><button class="cbtn ${v==='+'?'p':''}" data-c="${cg.c}" data-v="+">+</button><button class="cbtn ${v==='-'?'m':''}" data-c="${cg.c}" data-v="−">−</button><button class="cbtn ${v==='?'?'u':''}" data-c="${cg.c}" data-v="?">?</button></div></td>`;
+    const ex=COG_EX[cg.c]||{neg:[],pos:[]};
+    const negItems=ex.neg.map(e=>`<li>${e}</li>`).join('');
+    const posItems=ex.pos.map(e=>`<li>${e}</li>`).join('');
+    tr.innerHTML=`<td><div class="clb">${cg.l}<button class="tip-btn" title="Voir des exemples">💡</button></div><div class="cog-tip" id="tip-${cg.c}" style="display:none"><div class="cog-tip-neg"><strong>Exemples de difficultés</strong><ul>${negItems}</ul></div><div class="cog-tip-pos"><strong>Exemples de points forts</strong><ul>${posItems}</ul></div></div></td><td><div class="cdsc">${cg.d}</div></td><td><div class="cbtns"><button class="cbtn ${v==='+'?'p':''}" data-c="${cg.c}" data-v="+">+</button><button class="cbtn ${v==='-'?'m':''}" data-c="${cg.c}" data-v="−">−</button><button class="cbtn ${v==='?'?'u':''}" data-c="${cg.c}" data-v="?">?</button></div></td>`;
     tr.querySelectorAll('.cbtn').forEach(btn=>{
       btn.onclick=()=>{
         const cv=btn.dataset.v==='+' ? '+' : btn.dataset.v==='−' ? '-' : '?';
@@ -457,6 +558,17 @@ function S6(p){
         btn.className='cbtn '+(cv==='+'?'p':cv==='-'?'m':'u');
       };
     });
+    const tipBtn=tr.querySelector('.tip-btn');
+    const tipDiv=tr.querySelector('.cog-tip');
+    if(tipBtn&&tipDiv){
+      tipBtn.onclick=()=>{
+        const open=tipDiv.style.display==='none';
+        // Fermer tous les autres tips ouverts
+        p.querySelectorAll('.cog-tip').forEach(t=>t.style.display='none');
+        p.querySelectorAll('.tip-btn').forEach(b=>b.style.opacity='.55');
+        if(open){tipDiv.style.display='block';tipBtn.style.opacity='1';}
+      };
+    }
     tb.appendChild(tr);
   });
   p.querySelector('#s6p').onclick=()=>go(ST.suppDom.length>0?5:4);
@@ -522,24 +634,38 @@ function S7(p){
 
   // Résumé observables par section
   h+=`<div class="sblk"><div class="sblk-lbl">Résumé des observations</div><div class="s2col">`;
-  // Difficultés
-  if(ST.diffDom.length>0){
-    h+=`<div class="smini"><div class="sminitit">🔴 Difficultés (${totalDiff} obs.)</div><div>`;
-    ST.diffDom.forEach(d=>h+=`<span class="tag">${getLabelFor(d)}</span>`);
-    h+=`</div></div>`;
+  // Difficultés — liste détaillée
+  {
+    const allDiff={...getObsDomainItems(ST.fondCk),...getObsDomainItems(ST.diffCk)};
+    const tot=Object.keys(ST.fondCk).length+totalDiff;
+    if(tot>0){
+      h+=`<div class="smini"><div class="sminitit">🔴 Difficultés (${tot} obs.)</div>`;
+      for(const [dom,items] of Object.entries(allDiff)){
+        h+=`<div class="obs-domain-lbl">${dom}</div><ul class="obs-list">`;
+        items.forEach(txt=>h+=`<li>${txt}</li>`);
+        h+=`</ul>`;
+      }
+      h+=`</div>`;
+    }
   }
-  // Points d'appuis
-  if(ST.suppDom.length>0){
-    h+=`<div class="smini"><div class="sminitit">🟢 Points d'appuis (${totalSupp} obs.)</div><div>`;
-    ST.suppDom.forEach(d=>h+=`<span class="tag">${getLabelFor(d)}</span>`);
-    h+=`</div></div>`;
-  }
-  // Cognitif
-  if(cogNeg.length>0||cogPos.length>0){
-    h+=`<div class="smini"><div class="sminitit">🧠 Cognitif</div>`;
-    if(cogNeg.length>0) h+=`<div style="font-size:.78rem;color:var(--tl);margin-bottom:.2rem">Difficultés : ${cogNeg.join(', ')}</div>`;
-    if(cogPos.length>0) h+=`<div style="font-size:.78rem;color:var(--tl)">Points forts : ${cogPos.join(', ')}</div>`;
+  // Points d'appuis — liste détaillée
+  if(totalSupp>0){
+    const allSupp=getSuppDomainItems(ST.suppCk);
+    h+=`<div class="smini"><div class="sminitit">🟢 Points d'appuis (${totalSupp} obs.)</div>`;
+    for(const [dom,items] of Object.entries(allSupp)){
+      h+=`<div class="obs-domain-lbl">${dom}</div><ul class="obs-list">`;
+      items.forEach(txt=>h+=`<li>${txt}</li>`);
+      h+=`</ul>`;
+    }
     h+=`</div>`;
+  }
+  // Cognitif — radar chart (full width)
+  if(COGS.some(cg=>ST.cog[cg.c])){
+    h+=`<div class="smini cog-full"><div class="sminitit">🧠 Cognitif — Profil des fonctions exécutives</div>
+    <div class="cog-rad-wrap"><canvas id="cogRadar"></canvas></div>
+    ${cogNeg.length>0?`<div class="cog-leg cog-leg-neg">Difficultés : ${cogNeg.join(', ')}</div>`:''}
+    ${cogPos.length>0?`<div class="cog-leg cog-leg-pos">Points forts : ${cogPos.join(', ')}</div>`:''}
+    </div>`;
   }
   h+=`</div></div>`;
 
@@ -562,6 +688,37 @@ function S7(p){
   </div></div>`;
 
   p.innerHTML=h;
+  // ── Radar chart cognitif ──
+  (()=>{
+    const cv=p.querySelector('#cogRadar');
+    if(!cv||typeof Chart==='undefined') return;
+    const hasCog=COGS.some(cg=>ST.cog[cg.c]);
+    if(!hasCog) return;
+    const vals=COGS.map(cg=>ST.cog[cg.c]==='+'?2:ST.cog[cg.c]==='-'?0:1);
+    const ptColors=vals.map(v=>v===0?'#c0392b':v===2?'#5a9e80':'#b0b0b0');
+    new Chart(cv,{
+      type:'radar',
+      data:{
+        labels:COGS.map(cg=>cg.l),
+        datasets:[{
+          data:vals,
+          backgroundColor:'rgba(127,169,155,.22)',
+          borderColor:'#7FA99B',
+          borderWidth:2,
+          pointBackgroundColor:ptColors,
+          pointRadius:5,
+          pointHoverRadius:7,
+        }]
+      },
+      options:{
+        scales:{r:{min:0,max:2,ticks:{stepSize:1,display:false},grid:{color:'rgba(0,0,0,.08)'},
+          pointLabels:{font:{size:10,family:'Outfit'},color:'#2C3830'}}},
+        plugins:{legend:{display:false},tooltip:{callbacks:{
+          label:ctx=>{const v=ctx.raw;return v===2?'Point fort ✓':v===0?'Difficulté ✗':'Non évalué';}
+        }}}
+      }
+    });
+  })();
   p.querySelector('#s7p').onclick=()=>go(6);
   p.querySelector('#s7pr').onclick=()=>window.print();
   p.querySelector('#s7r').onclick=()=>{
