@@ -16,10 +16,8 @@ body{font-family:'Outfit',sans-serif;background:var(--cr);color:var(--tx);min-he
 #app{max-width:860px;margin:0 auto;padding:0 1rem 5rem;}
 
 /* HEADER */
-.hdr{display:flex;align-items:center;justify-content:space-between;padding:1.3rem 0 1rem;border-bottom:1px solid var(--bd);margin-bottom:1.5rem;}
-.logo{display:flex;align-items:center;gap:.65rem;}
-.logo-text{font-family:'Playfair Display',serif;font-style:italic;font-size:1.55rem;color:var(--sgd);letter-spacing:.06em;line-height:1;}
-.logo-text sup{font-style:normal;font-size:.65em;vertical-align:super;}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 0 1rem;border-bottom:1.5px solid var(--bd);margin-bottom:1.5rem;}
+.logo{display:flex;align-items:center;}
 .badge{display:flex;align-items:center;gap:.4rem;background:var(--wh);border:1.5px solid var(--bd);border-radius:2rem;padding:.28rem .9rem;font-size:.8rem;color:var(--tl);}
 .badge strong{color:var(--sgd);}
 
@@ -51,15 +49,14 @@ body{font-family:'Outfit',sans-serif;background:var(--cr);color:var(--tx);min-he
 .finp:focus,.fsel:focus{outline:none;border-color:var(--sg);}
 
 /* WELCOME */
-.wh{text-align:center;padding:.8rem 0 1.4rem;}
-.wbig{font-family:'Playfair Display',serif;font-style:italic;font-size:3rem;color:var(--sgd);letter-spacing:.07em;}
-.wbig sup{font-style:normal;font-size:1.1rem;vertical-align:super;}
-.wsub{font-size:.88rem;color:var(--tl);margin-top:.4rem;line-height:1.7;}
-.wcards{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin-top:1.4rem;}
-.wcard{text-align:center;padding:.9rem .6rem;border-radius:11px;background:var(--sgp);}
-.wcard-ic{font-size:1.3rem;margin-bottom:.25rem;}
-.wcard-t{font-size:.76rem;font-weight:600;color:var(--sgd);}
-.wcard-s{font-size:.66rem;color:var(--tl);margin-top:.12rem;line-height:1.4;}
+.wh{text-align:center;padding:1.4rem 0 1.8rem;}
+.wsub{font-size:.95rem;color:var(--tl);margin-top:.65rem;line-height:1.8;letter-spacing:.01em;}
+.wsub-rule{width:48px;height:2px;background:var(--sgl);border-radius:2px;margin:.9rem auto .85rem;}
+.wcards{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin-top:1.6rem;}
+.wcard{text-align:center;padding:1.1rem .8rem;border-radius:14px;background:var(--sgp);border:1px solid var(--bd);transition:box-shadow .15s;}
+.wcard-ic{font-size:1.55rem;margin-bottom:.35rem;}
+.wcard-t{font-size:.78rem;font-weight:700;color:var(--sgd);letter-spacing:.01em;}
+.wcard-s{font-size:.68rem;color:var(--tl);margin-top:.18rem;line-height:1.5;}
 
 /* DOMAIN CARDS */
 .dlimit{font-size:.76rem;color:var(--tl);text-align:right;margin-bottom:.5rem;}
@@ -179,10 +176,10 @@ body{font-family:'Outfit',sans-serif;background:var(--cr);color:var(--tx);min-he
 <div id="app">
 
 <div class="hdr">
-  <div class="logo">
-    <img src="/logo.PNG" alt="L'Alambic" style="height:60px;width:auto;mix-blend-mode:multiply;">
-  </div>
   <div id="badge" class="badge" style="display:none"><strong id="badge-name"></strong>&nbsp;·&nbsp;<span id="badge-lvl"></span></div>
+  <div class="logo" style="margin-left:auto">
+    <img src="/logo.PNG" alt="L'Alambic" style="height:88px;width:auto;mix-blend-mode:multiply;">
+  </div>
 </div>
 
 <div class="stp-wrap">
@@ -375,8 +372,9 @@ function getSuppDomainItems(ckObj){
 function S0(p){
   p.innerHTML=`<div class="pan">
     <div class="wh">
-      <img src="/logo.PNG" alt="L'Alambic" style="height:110px;width:auto;mix-blend-mode:multiply;margin-bottom:.3rem;">
-      <div class="wsub">Observer, comprendre et adapter<br>pour mieux accompagner chaque élève</div>
+      <img src="/logo.PNG" alt="L'Alambic" style="height:165px;width:auto;mix-blend-mode:multiply;display:block;margin:0 auto .5rem;">
+      <div class="wsub-rule"></div>
+      <div class="wsub">Observer · Comprendre · Adapter<br><span style="font-size:.84rem;opacity:.8">Pour mieux accompagner chaque élève</span></div>
     </div>
     <div class="frow">
       <div class="fg"><label class="flbl">Prénom de l'élève *</label><input class="finp" id="ip-p" type="text" placeholder="Prénom" value="${ST.prenom}"></div>
