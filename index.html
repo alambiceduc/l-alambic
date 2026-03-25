@@ -625,7 +625,7 @@ Mentionner si un bilan professionnel est à envisager (orthophoniste, ergothéra
 Format : titres en **gras**, tirets pour les listes. Longueur : 450-550 mots.`;
 
   try{
-    const res=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const res=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
     let txt='';
     if(res.ok){const data=await res.json();txt=data.content?.[0]?.text||'Erreur.';}
     else txt='Erreur de connexion à l’API. Vérifiez la configuration Vercel.';
