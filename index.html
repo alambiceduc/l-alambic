@@ -146,6 +146,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cr);color:var(--tx);min-he
 .btn{display:inline-flex;align-items:center;gap:.3rem;padding:.58rem 1.2rem;border-radius:9px;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:600;transition:all .17s;}
 .bpri{background:var(--sgd);color:#fff;}.bpri:hover{background:#3d6358;}.bpri:disabled{background:#b0c8c2;cursor:default;}
 .bsec{background:var(--wh);color:var(--tx);border:1.5px solid var(--bd);}.bsec:hover{border-color:var(--sg);}
+.cat-badge{font-size:.68rem;background:var(--sgp);color:var(--sgd);border:1px solid var(--sgl);border-radius:99px;padding:.1rem .5rem;}
 .bdng{background:var(--wh);color:var(--tc);border:1.5px solid #e0b0a0;}.bdng:hover{background:#fdf0ea;}
 
 @media print{.stp-wrap,.brow,.hdr{display:none!important;}body{background:#fff;}.pan{border:none;padding:0;}}
@@ -156,7 +157,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cr);color:var(--tx);min-he
 
 <div class="hdr">
   <div class="logo">
-    <img src="/logo.PNG" alt="L'Alambic" style="height:44px;width:auto;">
+    <img src="/logo.PNG" alt="L'Alambic" style="height:60px;width:auto;mix-blend-mode:multiply;">
   </div>
   <div id="badge" class="badge" style="display:none"><strong id="badge-name"></strong>&nbsp;·&nbsp;<span id="badge-lvl"></span></div>
 </div>
@@ -195,38 +196,36 @@ const COGS=[
   {c:'aut',l:'Autonomie cognitive',d:"Se lancer seul, vérifier, corriger sans l'adulte"}
 ];
 
-const PRI={'Conditions physiologiques favorables':1,'Audition fonctionnelle':2,'Vision fonctionnelle':3,'Sécurité':4,"Élocution fonctionnelle":5,"Identifier, exprimer et réguler ses émotions":6,"Construire la confiance et l'estime de soi":7,'Cadre clair, structurant et contenant':8,'Outils et réponses adaptées pour gérer les situations de crise':9,"Appartenir à un groupe, s'y sentir reconnu et accepté":10,"Développer les habiletés sociales et l'empathie":11,'Donner du sens aux apprentissages':13,'Attention':14,'Inhibition':15,'Mémoire de travail':16,"Repères pour s'organiser dans l'espace":17,"Développer l'autonomie et l'initiative":18,'Organisation':19,'Planification':20,'Flexibilité mentale':21,'Familiarisation avec la langue française et mathématique':22,'Mémoriser à long terme':23,'Raisonnement':24,'Développer la motricité fine et la graphomotricité':25,'Développer la motricité globale':26,'Repères pour structurer le temps':27,'Construire des représentations mentales et conceptualiser':28};
 
 const COGB={att:'Attention',inh:'Inhibition',mdt:'Mémoire de travail',fle:'Flexibilité mentale',pla:'Planification',org:'Organisation',rai:'Raisonnement',mem:'Mémoriser à long terme',rsp:"Repères pour s'organiser dans l'espace",rst:'Repères pour structurer le temps',aut:"Développer l'autonomie et l'initiative"};
 
 // ── ALGO ──
+const OBS_MAP={"COG_ATT_01":[32],"COG_ATT_02":[32, 40],"COG_ATT_03":[32],"COG_ATT_04":[32],"COG_ATT_05":[32],"COG_ATT_06":[32],"COG_AUT_01":[40, 49, 50],"COG_AUT_02":[14, 40, 41],"COG_AUT_03":[10, 14],"COG_AUT_04":[40, 46, 56],"COG_FLX_01":[41],"COG_FLX_02":[41],"COG_FLX_03":[41],"COG_FLX_04":[41, 53],"COG_FLX_05":[41, 42],"COG_FLX_06":[41],"COG_INH_01":[40],"COG_INH_02":[40],"COG_INH_03":[40],"COG_INH_04":[32, 40],"COG_INH_05":[9, 40],"COG_INH_06":[40],"COG_INH_07":[40, 41],"COG_MDT_01":[33, 34],"COG_MDT_02":[33, 34, 31],"COG_MDT_03":[33, 34, 31],"COG_MDT_04":[38, 39],"COG_MDT_05":[33, 34, 35, 36, 37, 38, 39],"COG_MDT_06":[36, 37, 38, 39],"COG_MEM_01":[18, 52],"COG_MEM_02":[19],"COG_MEM_03":[19, 29],"COG_MEM_04":[16, 22],"COG_MEM_05":[15],"COG_ORG_01":[14, 31],"COG_ORG_02":[29, 31],"COG_ORG_03":[29, 31],"COG_ORG_04":[29, 31, 49],"COG_PLA_01":[14, 31, 49],"COG_PLA_02":[49, 51, 52],"COG_PLA_03":[14, 49, 51],"COG_PLA_04":[18, 49, 52],"COG_PLA_05":[30, 49],"COG_RAI_01":[42, 43, 44, 53, 54],"COG_RAI_02":[42, 43, 46, 53, 54, 56],"COG_RAI_03":[41, 46, 56],"COG_RAI_04":[53, 54, 56],"COG_RAI_05":[42, 44, 45, 55],"COG_RAI_06":[46, 51, 56],"COG_STE_01":[29],"COG_STE_02":[29, 6],"COG_STE_03":[29],"COG_STE_04":[29],"COG_STE_05":[29],"COG_STE_06":[30],"COG_STE_07":[25, 30],"COG_STE_08":[30, 42],"COMP_ADU_01":[8, 9, 11, 40, 7],"COMP_ADU_02":[8, 9, 40, 11, 7],"COMP_ADU_03":[8, 9, 40, 11, 7],"COMP_ADU_04":[7, 10, 12, 14],"COMP_ADU_05":[7, 9, 12],"COMP_APP_01":[10, 13, 14],"COMP_APP_02":[10, 14, 32],"COMP_APP_03":[7, 10, 14],"COMP_APP_04":[13, 13],"COMP_APP_05":[13],"COMP_APP_06":[10, 13],"COMP_APP_07":[7, 10, 13, 8],"COMP_APP_08":[7, 10, 13],"COMP_APP_09":[7, 10, 14],"COMP_APP_10":[7, 10, 13],"COMP_APP_11":[7, 9, 10],"COMP_APP_12":[10, 13, 41],"COMP_CON_01":[10, 13, 13],"COMP_CON_02":[11, 13],"COMP_CON_03":[10],"COMP_CON_04":[10, 12],"COMP_CON_05":[9, 10],"COMP_CON_06":[10, 12, 14],"COMP_CON_07":[7, 10, 14],"COMP_CON_08":[10, 12, 14],"COMP_CON_09":[7, 10, 14],"COMP_CON_10":[7, 9, 10],"COMP_ECO_01":[7, 9, 12],"COMP_ECO_02":[7, 9],"COMP_ECO_03":[7, 9, 13],"COMP_ECO_04":[7, 11, 12],"COMP_ECO_05":[1, 7, 13],"COMP_ECO_06":[7, 9, 13],"COMP_EMO_01":[8, 9, 10],"COMP_EMO_02":[7, 9],"COMP_EMO_03":[7, 9, 41],"COMP_EMO_04":[2, 9, 40, 3],"COMP_EMO_05":[8, 9, 11],"COMP_EMO_06":[1, 8, 9],"COMP_EMO_07":[7, 8, 9],"COMP_EMO_08":[4, 9, 23],"COMP_EMO_09":[4, 9, 23],"COMP_EMO_10":[8, 9, 41],"COMP_EMO_11":[1, 7, 9],"COMP_EMO_12":[9, 11, 41],"COMP_PAI_01":[11, 12, 40, 41],"COMP_PAI_02":[11],"COMP_PAI_03":[10, 12, 14],"COMP_PAI_04":[7, 11, 12],"COMP_PAI_05":[7, 9, 12],"COMP_PAI_06":[9, 11, 12],"COMP_PAI_07":[8, 9, 11, 40, 7],"COMP_PAI_08":[8, 9, 11, 40, 7],"COMP_PAI_09":[11, 12, 40],"COMP_PAI_10":[9, 11],"COMP_PAI_11":[11, 40, 41],"COMP_PAI_12":[11, 40, 41],"COMP_PAI_13":[7, 12],"COMP_PAI_14":[9, 10, 12],"COMP_REG_01":[8, 11, 40, 7],"COMP_REG_02":[11, 20, 41],"COMP_REG_03":[8, 7, 40],"COMP_REG_04":[7, 10],"COMP_REG_05":[10, 11, 7],"COMP_REG_06":[7, 30, 41],"COMP_REG_07":[11, 40],"COMP_REG_08":[7, 40],"COMP_REG_09":[7, 40, 5],"COMP_REG_10":[7, 8, 40],"COMP_REG_11":[7, 8, 40, 40],"COMP_REG_12":[7, 8, 9, 10],"COMP_REG_13":[7, 8, 9, 10],"COMP_REG_14":[8, 11, 40],"ELEM_AP_01":[17, 38, 50],"ELEM_AP_02":[17, 38],"ELEM_AP_03":[17, 38, 40],"ELEM_CE_01":[21, 34, 43],"ELEM_CE_02":[21, 34, 43, 54],"ELEM_CE_03":[21, 34, 54],"ELEM_CE_04":[21, 34, 43, 54],"ELEM_CM_01":[18, 39, 52],"ELEM_CM_02":[18, 39, 52],"ELEM_CM_03":[18, 39, 52],"ELEM_CM_04":[18, 39, 41, 52],"ELEM_CM_05":[39, 44, 55],"ELEM_CM_06":[33, 39],"ELEM_CO_01":[20, 33, 42],"ELEM_CO_02":[20, 33, 42],"ELEM_CO_03":[20, 33, 42, 53],"ELEM_CO_04":[20, 33, 53],"ELEM_CO_05":[20, 33, 53, 42],"ELEM_CP_01":[25, 44, 45],"ELEM_CP_02":[18, 40, 41, 52],"ELEM_CP_03":[18, 40, 41, 52],"ELEM_CP_04":[39, 44, 56],"ELEM_CP_05":[29, 32, 52],"ELEM_CP_06":[29, 39, 52],"ELEM_CP_07":[29, 39, 47, 52],"ELEM_CP_08":[29, 39, 52],"ELEM_CP_09":[18, 40, 41, 52],"ELEM_CP_10":[18, 39, 52],"ELEM_CP_11":[18, 37, 52],"ELEM_CP_12":[29, 37, 52],"ELEM_CP_13":[18, 37, 39, 52],"ELEM_CP_14":[18, 36, 39, 52],"ELEM_CP_15":[18, 39],"ELEM_DC_01":[17, 24, 27, 38],"ELEM_DC_02":[17, 24, 27, 38],"ELEM_DC_03":[17, 38, 42],"ELEM_DC_04":[17, 38, 40],"ELEM_DF_01":[4, 7, 9, 23],"ELEM_DF_02":[4, 23],"ELEM_DF_03":[4, 23, 35],"ELEM_DF_04":[4, 24],"ELEM_DF_05":[4, 35],"ELEM_DF_06":[4, 40],"ELEM_EN_01":[24, 26],"ELEM_EN_02":[24, 26, 37],"ELEM_EN_03":[24, 26, 37],"ELEM_EN_04":[24, 26, 37],"ELEM_EN_05":[24, 26, 37],"ELEM_EN_06":[24, 26, 37],"ELEM_EN_07":[15, 24, 26],"ELEM_EN_08":[26, 37, 40],"ELEM_EO_01":[10, 14, 23],"ELEM_EO_02":[23, 35, 49],"ELEM_EO_03":[23, 35, 48, 49],"ELEM_EO_04":[23, 35, 49],"ELEM_EO_05":[23, 35, 53],"ELEM_EO_06":[32, 35, 40],"ELEM_FD_01":[44, 47, 55],"ELEM_FD_02":[44, 47, 58],"ELEM_FD_03":[44, 47, 58],"ELEM_FD_04":[44, 47, 58],"ELEM_FD_05":[44, 47, 58],"ELEM_FD_06":[25, 44, 47],"ELEM_FD_07":[29, 44, 47],"ELEM_GC_01":[28, 34, 48],"ELEM_GC_02":[15, 28, 48],"ELEM_GC_03":[28, 37, 48],"ELEM_GC_04":[28, 37, 48],"ELEM_GC_05":[28, 37, 48],"ELEM_GC_06":[28, 40, 48],"ELEM_GC_07":[28, 37, 48],"ELEM_GE_01":[6],"ELEM_GE_02":[6],"ELEM_GE_03":[6],"ELEM_GE_04":[6, 29],"ELEM_GE_05":[6, 32],"ELEM_GE_06":[6, 37],"ELEM_GE_07":[6, 37, 32],"ELEM_LC_01":[16, 20, 22],"ELEM_LC_02":[16, 22, 23],"ELEM_LC_03":[16, 22, 23, 35],"ELEM_LC_04":[16, 22],"ELEM_LC_05":[16, 22, 48],"ELEM_LC_06":[16, 22, 42],"ELEM_LE_01":[16, 22, 23],"ELEM_LE_02":[16, 22, 23],"ELEM_LE_03":[16, 22, 23, 35],"ELEM_LE_04":[16, 22],"ELEM_LE_05":[16, 22, 48],"ELEM_LE_06":[16, 22, 42],"ELEM_LN_01":[25, 45, 47],"ELEM_LN_02":[25, 45, 47],"ELEM_LN_03":[26, 39, 47],"ELEM_LN_04":[26, 39, 47],"ELEM_LO_01":[15, 17, 38],"ELEM_LO_02":[15, 17, 38],"ELEM_MC_01":[38, 40, 43],"ELEM_MC_02":[17, 38, 40],"ELEM_MF_01":[6],"ELEM_MF_02":[6],"ELEM_MF_03":[3, 6],"ELEM_MF_04":[6],"ELEM_MF_05":[1, 6],"ELEM_MF_06":[6, 32],"ELEM_MG_01":[5],"ELEM_MG_02":[5, 29],"ELEM_MG_03":[5],"ELEM_MG_04":[5, 32],"ELEM_MG_05":[5, 6],"ELEM_MG_06":[5, 40],"ELEM_MG_07":[1, 5],"ELEM_MG_08":[1, 5],"ELEM_MG_09":[5, 6],"ELEM_NB_01":[45, 55],"ELEM_NB_02":[45, 55],"ELEM_NB_03":[45, 55],"ELEM_NB_04":[45, 55],"ELEM_OL_01":[15, 26, 37],"ELEM_OL_02":[15, 26, 37],"ELEM_OL_03":[15, 19, 26],"ELEM_OL_04":[15, 26, 37],"ELEM_PA_01":[15, 24],"ELEM_PA_02":[15, 24],"ELEM_PA_03":[15, 24, 27],"ELEM_PA_04":[15, 24, 27],"ELEM_PA_05":[15, 24, 27],"ELEM_PA_06":[3, 15, 24],"ELEM_PB_01":[36, 51, 56],"ELEM_PB_02":[21, 34, 36, 43],"ELEM_PB_03":[25, 36],"ELEM_PB_04":[21, 34, 36, 43],"ELEM_PB_05":[25, 44, 57],"ELEM_PE_01":[26, 28, 37, 49],"ELEM_PE_02":[26, 28, 37],"ELEM_PE_03":[26, 28, 48, 49],"ELEM_PE_04":[26, 37, 40, 49],"ELEM_PE_05":[26, 34, 49],"ELEM_PE_06":[26, 37, 49],"ELEM_PE_07":[26, 40, 49],"ELEM_PE_08":[26, 28, 48, 49],"ELEM_PE_09":[26, 30, 49],"ELEM_PE_10":[26, 28, 48],"ELEM_PE_11":[26, 28, 37],"ELEM_PE_12":[16, 22, 26],"ELEM_PE_13":[16, 22, 26],"ELEM_PE_14":[26, 35, 49],"ELEM_PH_01":[24, 42],"ELEM_PH_02":[24, 42],"ELEM_PH_03":[24, 42],"ELEM_PH_04":[24, 37, 42],"ELEM_PH_05":[24, 42],"ELEM_RM_01":[36, 46, 51],"ELEM_RM_02":[36, 46, 51],"ELEM_RM_03":[36, 44, 46, 51],"ELEM_RM_04":[36, 40, 56],"ELEM_RM_05":[36, 51, 52],"ELEM_RM_06":[36, 51, 32],"ELEM_RM_07":[36, 44, 56],"ELEM_SM_01":[18, 40, 41, 51],"ELEM_SM_02":[18, 40, 41, 51],"ELEM_SM_03":[39, 44, 56],"ELEM_SM_04":[18, 39, 52],"ELEM_SM_05":[25, 44, 57],"ELEM_SO_01":[26, 29, 37],"ELEM_SO_02":[26, 28, 37],"ELEM_VP_01":[45, 47, 55],"ELEM_VP_02":[29, 39, 47],"ELEM_VP_03":[44, 47, 55],"ELEM_VP_04":[44, 47, 55],"ELEM_VP_05":[44, 47, 55],"ELEM_VP_06":[29, 44, 47],"FOND_ENT_01":[2],"FOND_ENT_02":[2],"FOND_ENT_03":[2, 32],"FOND_ENT_04":[2],"FOND_ENT_05":[2, 4, 9, 10, 40],"FOND_ENT_06":[2, 33],"FOND_ENT_07":[2, 32],"FOND_ENT_08":[2, 32, 10],"FOND_ENT_09":[2, 40],"FOND_ENT_10":[2, 20, 21, 23, 24, 26, 27],"FOND_ENT_11":[2, 4],"FOND_VIE_01":[1, 7],"FOND_VIE_02":[1, 7],"FOND_VIE_03":[1, 7],"FOND_VIE_04":[1, 7],"FOND_VIE_05":[1, 7],"FOND_VIE_06":[1, 7],"FOND_VIE_07":[1, 32],"FOND_VIE_08":[7],"FOND_VOIR_01":[3, 16],"FOND_VOIR_02":[3],"FOND_VOIR_03":[1, 3],"FOND_VOIR_04":[3],"FOND_VOIR_05":[3],"FOND_VOIR_06":[3, 10, 29],"FOND_VOIR_07":[3, 32],"FOND_VOIR_08":[3, 29, 32],"FOND_VOIR_09":[3, 32],"FOND_VOIR_10":[3, 29],"FOND_VOIR_11":[3, 6, 29],"MAT_CD_01":[45, 55],"MAT_CD_02":[39, 45],"MAT_CD_03":[32, 45],"MAT_CD_04":[45, 55],"MAT_CD_05":[31, 39, 45],"MAT_CD_06":[39, 45, 55],"MAT_CO_01":[20, 33, 42],"MAT_CO_02":[20, 33, 42],"MAT_CO_03":[20, 33, 42, 53],"MAT_CO_04":[20, 33, 53],"MAT_CO_05":[20, 33, 42, 53],"MAT_CT_01":[45, 55],"MAT_CT_02":[36, 45, 46],"MAT_CT_03":[36, 45, 46],"MAT_CT_04":[36, 45, 46],"MAT_CT_05":[25, 44, 55],"MAT_CT_06":[36, 44, 46, 55],"MAT_DF_01":[4, 7, 9, 23],"MAT_DF_02":[4, 23],"MAT_DF_03":[4, 23, 35],"MAT_DF_04":[4, 24],"MAT_DF_05":[4, 35],"MAT_DF_06":[4, 40],"MAT_EO_01":[10, 14, 23],"MAT_EO_02":[23, 35],"MAT_EO_03":[23, 35, 42],"MAT_EO_04":[23, 35, 49],"MAT_EO_05":[23, 35, 53],"MAT_EO_06":[32, 35, 40],"MAT_GE_01":[6],"MAT_GE_02":[6],"MAT_GE_03":[6],"MAT_GE_04":[6],"MAT_GE_05":[6, 32],"MAT_GE_06":[6, 32],"MAT_GE_07":[6],"MAT_GE_08":[6, 29],"MAT_LC_01":[16, 20, 22],"MAT_LC_02":[16, 22, 23],"MAT_LC_03":[16, 22, 23, 35],"MAT_LC_04":[16, 22],"MAT_LC_05":[16, 22, 42],"MAT_LC_06":[16, 22, 42],"MAT_LE_01":[16, 22, 23],"MAT_LE_02":[16, 22, 23],"MAT_LE_03":[16, 22, 23, 35],"MAT_LE_04":[16, 22],"MAT_LE_05":[16, 22, 42],"MAT_LE_06":[16, 22, 42],"MAT_MOF_01":[6],"MAT_MOF_02":[6],"MAT_MOF_03":[3, 6],"MAT_MOF_04":[6],"MAT_MOF_05":[1, 6],"MAT_MOF_06":[6, 32],"MAT_MOG_01":[5],"MAT_MOG_02":[5, 29],"MAT_MOG_03":[5],"MAT_MOG_04":[5, 32],"MAT_MOG_05":[5, 40],"MAT_MOG_06":[1, 5],"MAT_MOG_07":[1, 5],"MAT_MOG_08":[5, 6],"MAT_OI_01":[25, 39, 45],"MAT_OI_02":[29, 45, 55],"MAT_OI_03":[25, 29, 45],"MAT_OI_04":[45, 55],"MAT_PA_01":[15, 24],"MAT_PA_02":[15, 24],"MAT_PA_03":[15, 24],"MAT_PA_04":[15, 24],"MAT_PA_05":[15, 24, 32],"MAT_PE_01":[23, 26, 35],"MAT_PE_02":[24, 26],"MAT_PE_03":[24, 26],"MAT_PE_04":[24, 26],"MAT_PE_05":[24, 26],"MAT_PE_06":[24, 26],"MAT_PE_07":[15, 24, 26],"MAT_PH_01":[24, 42],"MAT_PH_02":[24, 42],"MAT_PH_03":[24, 42],"MAT_PH_04":[24, 37, 42],"MAT_PH_05":[24, 42],"MAT_RE_01":[13, 27],"MAT_RE_02":[9, 13, 26],"MAT_RN_01":[45, 55],"MAT_RN_02":[45, 55],"MAT_RN_03":[45],"MAT_RN_04":[44, 45, 55]};
+const REFERENTIEL=[null,{"s": "I. Physiologiques et sensori-moteurs", "l": "Besoin de conditions physiologiques favorables"},{"s": "I. Physiologiques et sensori-moteurs", "l": "Besoin d'une audition fonctionnelle"},{"s": "I. Physiologiques et sensori-moteurs", "l": "Besoin d'une vision fonctionnelle"},{"s": "I. Physiologiques et sensori-moteurs", "l": "Besoin d'une élocution fonctionnelle (articulation, non verbal, bégaiement…)"},{"s": "I. Physiologiques et sensori-moteurs", "l": "Besoin de développer la motricité globale"},{"s": "I. Physiologiques et sensori-moteurs", "l": "Besoin de développer la motricité fine et la graphomotricité"},{"s": "II. Psycho-affectifs, socio-affectifs", "l": "Besoin de sécurité"},{"s": "II. Psycho-affectifs, socio-affectifs", "l": "Besoin d'outils et de réponses adaptées pour gérer les situations de crise"},{"s": "II. Psycho-affectifs, socio-affectifs", "l": "Besoin d'identifier, exprimer et réguler ses émotions"},{"s": "II. Psycho-affectifs, socio-affectifs", "l": "Besoin de construire la confiance et l'estime de soi"},{"s": "II. Psycho-affectifs, socio-affectifs", "l": "Besoin de développer les habiletés sociales et l'empathie"},{"s": "II. Psycho-affectifs, socio-affectifs", "l": "Besoin d'appartenir à un groupe, s'y sentir reconnu, considéré et accepté"},{"s": "II. Psycho-affectifs, socio-affectifs", "l": "Besoin de donner du sens aux apprentissages"},{"s": "II. Psycho-affectifs, socio-affectifs", "l": "Besoin de développer l'autonomie et l'initiative"},{"s": "III. Repérage et ancrage", "l": "Besoin de mémoire à long terme pour retenir les symboles et l'orthographe des mots"},{"s": "III. Repérage et ancrage", "l": "Besoin de mémoire à long terme pour enrichir son lexique"},{"s": "III. Repérage et ancrage", "l": "Besoin de mémoire à long terme pour automatiser les stratégies de lecture"},{"s": "III. Repérage et ancrage", "l": "Besoin de mémoire à long terme pour automatiser les procédures de calcul"},{"s": "III. Repérage et ancrage", "l": "Besoin de mémoire à long terme pour retenir les leçons, poésies"},{"s": "III. Repérage et ancrage", "l": "Besoin de familiarisation avec la langue française pour comprendre à l'oral"},{"s": "III. Repérage et ancrage", "l": "Besoin de familiarisation avec la langue française pour comprendre l'écrit"},{"s": "III. Repérage et ancrage", "l": "Besoin de familiarisation avec la langue française pour enrichir son lexique"},{"s": "III. Repérage et ancrage", "l": "Besoin de familiarisation avec la langue française pour s'exprimer à l'oral"},{"s": "III. Repérage et ancrage", "l": "Besoin de familiarisation avec la langue française pour entrer dans l'écrit (phono, principe alpha, construire les premiers mots…)"},{"s": "III. Repérage et ancrage", "l": "Besoin de familiarisation avec la langue française pour comprendre le langage mathématique"},{"s": "III. Repérage et ancrage", "l": "Besoin de familiarisation avec la langue française pour écrire"},{"s": "III. Repérage et ancrage", "l": "Besoin de familiarisation avec la langue française pour lire"},{"s": "III. Repérage et ancrage", "l": "Besoin de familiarisation avec la langue française pour construire les compétences en grammaire et conjugaison"},{"s": "III. Repérage et ancrage", "l": "Besoin de repères pour s'organiser dans l'espace"},{"s": "III. Repérage et ancrage", "l": "Besoin de repères pour structurer le temps"},{"s": "III. Repérage et ancrage", "l": "Besoin d'organisation"},{"s": "IV. Fonctions exécutives de base", "l": "Besoin d'attention"},{"s": "IV. Fonctions exécutives de base", "l": "Besoin de mémoire de travail pour comprendre à l'oral"},{"s": "IV. Fonctions exécutives de base", "l": "Besoin de mémoire de travail pour comprendre l'écrit"},{"s": "IV. Fonctions exécutives de base", "l": "Besoin de mémoire de travail pour s'exprimer à l'oral"},{"s": "IV. Fonctions exécutives de base", "l": "Besoin de mémoire de travail pour résoudre des situations problèmes"},{"s": "IV. Fonctions exécutives de base", "l": "Besoin de mémoire de travail pour écrire"},{"s": "IV. Fonctions exécutives de base", "l": "Besoin de mémoire de travail pour lire"},{"s": "IV. Fonctions exécutives de base", "l": "Besoin de mémoire de travail pour calculer mentalement"},{"s": "IV. Fonctions exécutives de base", "l": "Besoin d'inhibition"},{"s": "IV. Fonctions exécutives de base", "l": "Besoin de flexibilité mentale"},{"s": "V. Fonctions exécutives de haut niveau", "l": "Besoin de construire des représentations mentales et de conceptualiser pour comprendre à l'oral"},{"s": "V. Fonctions exécutives de haut niveau", "l": "Besoin de construire des représentations mentales et de conceptualiser pour comprendre l'écrit"},{"s": "V. Fonctions exécutives de haut niveau", "l": "Besoin de construire des représentations mentales et de conceptualiser pour comprendre le langage mathématique"},{"s": "V. Fonctions exécutives de haut niveau", "l": "Besoin de construire des représentations mentales et de conceptualiser pour construire le nombre"},{"s": "V. Fonctions exécutives de haut niveau", "l": "Besoin de construire des représentations mentales et de conceptualiser pour résoudre des situations problèmes"},{"s": "V. Fonctions exécutives de haut niveau", "l": "Besoin de construire des représentations mentales et de conceptualiser pour construire le nombre et le système décimal"},{"s": "V. Fonctions exécutives de haut niveau", "l": "Besoin de construire des représentations mentales et de conceptualiser pour construire les compétences en grammaire et conjugaison"},{"s": "V. Fonctions exécutives de haut niveau", "l": "Besoin de planification pour écrire"},{"s": "V. Fonctions exécutives de haut niveau", "l": "Besoin de planification pour lire"},{"s": "V. Fonctions exécutives de haut niveau", "l": "Besoin de planification pour résoudre des situations problèmes"},{"s": "V. Fonctions exécutives de haut niveau", "l": "Besoin de planification pour automatiser les procédures de calcul"},{"s": "V. Fonctions exécutives de haut niveau", "l": "Besoin de raisonnement pour comprendre à l'oral"},{"s": "V. Fonctions exécutives de haut niveau", "l": "Besoin de raisonnement pour comprendre l'écrit"},{"s": "V. Fonctions exécutives de haut niveau", "l": "Besoin de raisonnement pour construire le nombre"},{"s": "V. Fonctions exécutives de haut niveau", "l": "Besoin de raisonnement pour résoudre des situations problèmes"},{"s": "V. Fonctions exécutives de haut niveau", "l": "Besoin de raisonnement pour comprendre le langage mathématique"},{"s": "V. Fonctions exécutives de haut niveau", "l": "Besoin de raisonnement pour construire le nombre et le système décimal"},{"s": "V. Fonctions exécutives de haut niveau", "l": "Besoin de raisonnement pour résoudre des problèmes"}];
+const COG_MAP={att:[32],inh:[40],mdt:[33,34,35,36,37,38,39],fle:[41],pla:[49,50,51,52],org:[31],rai:[53,54,56],mem:[15,16,17,18,19],rsp:[29],rst:[30],aut:[14]};
 function computeBesoins(){
-  const sc={};
-  // diff observables (poids fort)
-  for(const code of Object.keys(ST.diffCk)){
-    for(const [,subs] of Object.entries(OD.grouped)){
-      for(const [,sub] of Object.entries(subs)){
-        const it=sub.items.find(i=>i.code===code);
-        if(it) it.besoins.forEach((b,i)=>{sc[b]=(sc[b]||0)+Math.max(3-i,1);});
-      }
-    }
+  const cnt={};
+  const addNums=(nums,w)=>{for(const n of nums) cnt[n]=(cnt[n]||0)+w;};
+  // Difficultés (poids 2)
+  for(const code of Object.keys(ST.diffCk)) addNums(OBS_MAP[code]||[],2);
+  // Fondamentaux (poids 2)
+  for(const code of Object.keys(ST.fondCk)) addNums(OBS_MAP[code]||[],2);
+  // Cognitif noté '-' (poids 1)
+  for(const [k,v] of Object.entries(ST.cog)) if(v==='-') addNums(COG_MAP[k]||[],1);
+  // Séparer catégorie I (1-6) des catégories II-V (7-59)
+  const catI=[],catIIV=[];
+  for(const [ns,c] of Object.entries(cnt)){
+    const n=parseInt(ns);
+    if(n>=1&&n<=6) catI.push({n,c});
+    else if(n>=7) catIIV.push({n,c});
   }
-  // fond (poids modéré - juste pour info dans scoring, pas bloquant)
-  for(const code of Object.keys(ST.fondCk)){
-    for(const [,subs] of Object.entries(OD.grouped)){
-      for(const [,sub] of Object.entries(subs)){
-        const it=sub.items.find(i=>i.code===code);
-        if(it) it.besoins.forEach((b,i)=>{sc[b]=(sc[b]||0)+Math.max(2-i,1);});
-      }
-    }
-  }
-  // cognitif
-  for(const [c,v] of Object.entries(ST.cog)){
-    if(v==='-'&&COGB[c]) sc[COGB[c]]=(sc[COGB[c]]||0)+4;
-  }
-  return Object.entries(sc)
-    .sort((a,b)=>b[1]!==a[1]?b[1]-a[1]:(PRI[a[0]]||99)-(PRI[b[0]]||99))
-    .slice(0,5);
+  // Priorité : catégorie (II<III<IV<V) puis count desc
+  const catNum=n=>n<=14?2:n<=31?3:n<=41?4:5;
+  catIIV.sort((a,b)=>catNum(a.n)!==catNum(b.n)?catNum(a.n)-catNum(b.n):b.c-a.c);
+  // Stocker flags physiologiques (cat I)
+  ST.physioFlags=catI.map(x=>x.n);
+  // Retourner top 3 au format [[label,count],...]
+  return catIIV.slice(0,3).map(x=>[REFERENTIEL[x.n]?REFERENTIEL[x.n].l:'Besoin '+x.n, x.c]);
 }
 
 // ── STEPPER ──
@@ -325,7 +324,7 @@ function getLabelFor(domId){
 function S0(p){
   p.innerHTML=`<div class="pan">
     <div class="wh">
-      <div class="wbig">L&#8217;<sup>o</sup>Alambic</div>
+      <img src="/logo.PNG" alt="L'Alambic" style="height:110px;width:auto;mix-blend-mode:multiply;margin-bottom:.3rem;">
       <div class="wsub">Observer, comprendre et adapter<br>pour mieux accompagner chaque élève</div>
     </div>
     <div class="frow">
@@ -482,11 +481,18 @@ function S7(p){
     <div class="pdesc">Basée sur ${totalDiff} observable${totalDiff>1?'s':''} de difficultés${totalSupp>0?' et '+totalSupp+' point'+(totalSupp>1?'s':'')+' d’appuis':''} cochés.</div>`;
 
   // Recommandations fondamentaux (non bloquant, juste conseils)
-  if(fondCodes.length>0){
+  const physioLabels=(ST.physioFlags||[]).map(n=>REFERENTIEL[n]?REFERENTIEL[n].l:'').filter(Boolean);
+  const hasMotoFine=(ST.physioFlags||[]).includes(6);
+  const hasMotoGlob=(ST.physioFlags||[]).includes(5);
+  const hasElocut=(ST.physioFlags||[]).includes(4);
+  if(fondCodes.length>0||(ST.physioFlags||[]).length>0){
     h+=`<div class="rcard or"><div class="rcardtit or">⚡ Préalables fondamentaux — Recommandations</div>`;
     if(hasVision) h+=`<div>👁️ <strong>Bilan ophtalmologique recommandé</strong> — Des signes visuels ont été observés.</div>`;
     if(hasAudio) h+=`<div>👂 <strong>Bilan ORL / audiométrique recommandé</strong> — Des signes auditifs ont été observés.</div>`;
-    if(hasVie) h+=`<div>🏠 <strong>Signalement ou suivi éducatif à envisager</strong> — Des préoccupations liées aux conditions de vie ont été identifiées. Une équipe éducative (EE) ou un contact avec le RASED peut être utile.</div>`;
+    if(hasElocut) h+=`<div>🗣️ <strong>Bilan orthophonique à envisager</strong> — Des difficultés d'élocution ont été observées.</div>`;
+    if(hasMotoFine) h+=`<div>✍️ <strong>Bilan ergothérapeutique à envisager</strong> — Des difficultés de motricité fine ou graphomotricité ont été observées.</div>`;
+    if(hasMotoGlob) h+=`<div>🏃 <strong>Bilan psychomoteur à envisager</strong> — Des difficultés de motricité globale ont été observées.</div>`;
+    if(hasVie) h+=`<div>🏠 <strong>Signalement ou suivi éducatif à envisager</strong> — Des préoccupations liées aux conditions de vie ont été identifiées. Une équipe éducative (EE), un PRE ou un contact avec le RASED peut être utile.</div>`;
     h+=`</div>`;
   }
 
@@ -495,9 +501,21 @@ function S7(p){
   if(besoins.length===0){
     h+=`<div style="color:var(--tl);font-size:.84rem;font-style:italic">Aucun observable coché. Revenez aux étapes précédentes.</div>`;
   } else {
-    besoins.forEach(([b,sc],i)=>{
-      const pct=Math.round(sc/besoins[0][1]*100);
-      h+=`<div class="scrow"><div class="scrow-top"><span><strong>${i+1}.</strong> ${b}</span><span style="color:var(--tl);font-size:.73rem">${sc} pt${sc>1?'s':''}</span></div><div class="sbg"><div class="sfg" style="width:${pct}%"></div></div></div>`;
+    const catLabel=n=>{
+      const ref=REFERENTIEL[n];
+      if(!ref) return '';
+      const s=ref.s||'';
+      if(s.includes('II.')) return 'Psycho-affectif';
+      if(s.includes('III.')) return 'Repérage & ancrage';
+      if(s.includes('IV.')) return 'Fonctions exec. de base';
+      if(s.includes('V.')) return 'Fonctions exec. avancées';
+      return '';
+    };
+    besoins.forEach(([b],i)=>{
+      const refEntry=Object.values(REFERENTIEL).find(r=>r&&r.l===b);
+      const num=refEntry?REFERENTIEL.indexOf(refEntry):0;
+      const cl=catLabel(num);
+      h+=`<div class="scrow"><div class="scrow-top"><span><strong>${i+1}.</strong> ${b}</span>${cl?`<span class="cat-badge">${cl}</span>`:''}</div></div>`;
     });
   }
   h+=`</div>`;
