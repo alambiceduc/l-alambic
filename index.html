@@ -156,15 +156,7 @@ body{font-family:'Outfit',sans-serif;background:var(--cr);color:var(--tx);min-he
 
 <div class="hdr">
   <div class="logo">
-    <svg width="36" height="44" viewBox="0 0 44 54" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M17 5L17 22L5 42Q2 48 6 51Q9 54 14 54L30 54Q35 54 38 51Q42 48 39 42L27 22L27 5" stroke="#4E7A6E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      <line x1="13" y1="5" x2="31" y2="5" stroke="#4E7A6E" stroke-width="2" stroke-linecap="round"/>
-      <line x1="12" y1="30" x2="32" y2="30" stroke="#4E7A6E" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2 3"/>
-      <circle cx="28" cy="42" r="3.5" fill="#4E7A6E"/>
-      <path d="M27 5Q35 5 35 0" stroke="#4E7A6E" stroke-width="1.8" stroke-linecap="round"/>
-      <circle cx="35" cy="0.5" r="2" fill="#4E7A6E"/>
-    </svg>
-    <div class="logo-text">L&#8217;<sup>o</sup>Alambic</div>
+    <img src="/logo.PNG" alt="L'Alambic" style="height:44px;width:auto;">
   </div>
   <div id="badge" class="badge" style="display:none"><strong id="badge-name"></strong>&nbsp;·&nbsp;<span id="badge-lvl"></span></div>
 </div>
@@ -625,10 +617,10 @@ Mentionner si un bilan professionnel est à envisager (orthophoniste, ergothéra
 Format : titres en **gras**, tirets pour les listes. Longueur : 450-550 mots.`;
 
   try{
-    const res=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const res=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
     let txt='';
     if(res.ok){const data=await res.json();txt=data.content?.[0]?.text||'Erreur.';}
-    else txt='Erreur de connexion à l’API. Vérifiez la configuration Vercel.';
+    else{const ed=await res.json().catch(()=>({}));txt='Erreur API ('+res.status+'): '+(ed?.error?.message||'vérifiez les logs Vercel.');}
     txt=txt.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/^- (.+)$/gm,'<span style="display:block;padding-left:.5rem">• $1</span>').replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
     ST.aiTxt=txt;
     p.querySelector('#aiload').style.display='none';
